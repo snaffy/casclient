@@ -1,0 +1,7 @@
+/.git/
+.project
+.classpath
+/target/
+.settings
+*.log
+*/mail.properties

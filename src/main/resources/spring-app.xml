@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- 为@Autowired提供自动属性注入功能 
+	<context:annotation-config />-->
+
+	<!-- 扫描该包下的所有@Service和@Repository等注释，生成Bean -->
+	<context:component-scan base-package="casclient"></context:component-scan>
+
+	<!-- 导入权限管理-->
+	<import resource="classpath:spring-security.xml" />  
+	
+</beans>
