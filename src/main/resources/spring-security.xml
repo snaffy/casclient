@@ -14,8 +14,6 @@
 		http://www.springframework.org/schema/security 
 		http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<!-- entry-point-ref指明spring security抛出AuthenticationException时，必须将请求发往casEntryPoint
-		为使CAS生效，将ExceptionTranslationFilter的authenticationEntryPoint配置为CasAuthenticationEntryPoint -->
 	<security:http auto-config="true" entry-point-ref="casEntryPoint">
 		<security:intercept-url pattern="/user/**" access="hasRole('USER')" />
 		<security:intercept-url pattern="/admin/**" access="hasRole('ADMIN')" />
@@ -24,43 +22,32 @@
 		<security:custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>  
 	</security:http>
 
-	<!-- 配置通用参数 -->
 	<bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties">
-		<!-- service必须为CasAuthenticationFilter监听URL，4.0以后默认为/login/cas -->
 		<property name="service" value="${cas.client.ip}/login/cas"/>
-		<!-- sendRenew默认为false，告诉CAS login service用户每次访问service都要输入用户名密码 -->
 		<property name="sendRenew" value="false"/>
 	</bean>
 	
-	<!-- 配置CAS接入点 -->
 	<bean id="casEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
-		<!-- loginUrl：跳转到CAS Server的登录URL -->
 		<property name="loginUrl" value="${cas.server.ip}/cas/login"/>
 		<property name="serviceProperties" ref="serviceProperties"/>
 	</bean>
 	
-	<!-- 用户验证成功后，CAS Server返回Service Ticket到CasAuthenticationFilter监听的/login/cas -->
 	<bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
 		<property name="authenticationManager" ref="authenticationManager"/>
 	</bean>
 	
-	<!-- 配置认证管理, casFilter将返回内容封装成UsernamePasswordAuthenticationToken后，交给 authenticationManager处理-->
 	<security:authentication-manager alias="authenticationManager">
-		<!-- casAuthenticationProvider： 认证方式，可用database，ldap等 -->
 		<security:authentication-provider ref="casAuthenticationProvider" />
 	</security:authentication-manager>
 
-	<!-- authenticationManager的具体实现由casAuthenticationProvider提供 -->
 	<bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
-		<!--  casAuthenticationProvider利用userDetailsService，当用户经过CAS认证后，为用户加载authorities，此处采用in-memory配置，password并不使用，只用到authorities-->
 		<property name="authenticationUserDetailsService">
 			<bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
 				<constructor-arg ref="userService" />
 			</bean>
 		</property>
 		<property name="serviceProperties" ref="serviceProperties" />
-		<!-- casAuthenticationProvider利用 ticketValidator发送请求给CAS Server，验证Service Ticket -->
-		<property name="ticketValidator"> 
+		<property name="ticketValidator">
 			<bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
 				<constructor-arg index="0" value="${cas.server.ip}/cas" />
 			</bean>
@@ -71,23 +58,13 @@
 	<security:user-service id="userService">
 		<security:user name="casuser" password="Mellon" authorities="ROLE_ADMIN" />
 		<security:user name="artur" password="artur" authorities="ROLE_ADMIN" />
-		<security:user name="snaffy" password="volexideus13" authorities="ROLE_ADMIN" />
 	</security:user-service>
-
-	<!-- security:logout标签只注销了本机应用，但没有结束CAS Server和其他应用的session，通过配置requestSingleLogoutFilter和 singleLogoutFilter，实现所有相关应用的注销-->
-	<!-- 注销流程
-		 1、用户请求/logout，注销用户在本地的状态，将用户转到logout success page，即/cas-logout.jsp；
-		 2、cas-logout.jsp提示用户点击链接/logout/cas以登出所有应用；
-		 3、当用户点击链接时，用户重定向到CAS single logout URL（https://cas.server.ip:8443/cas/logout）
-		 4、在CAS Server上，CAS single logout URL发送single logout requests到所有CAS Services上。其中本地SingleSignOutFilter处理该logout请求，使session失效。
-	  -->
-	<!-- singleLogoutFilter处理CAS Server发送来的Single Logout Request，在Map中查找HttpSession，然后注销它 -->
 	<bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
 
-	<!-- 统一配置CAS Server和本地应用的域名 -->
 	<context:property-placeholder system-properties-mode="OVERRIDE" properties-ref="environment"/>
 	<util:properties id="environment">
 		<prop key="cas.client.ip">https://localhost:8445/casclient</prop>
-		<prop key="cas.server.ip">https://casclienttest</prop>
+		<prop key="cas.server.ip">https://localhost:8445</prop>
 	</util:properties>
+
 </beans>
