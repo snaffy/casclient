@@ -63,7 +63,7 @@
 
 	<context:property-placeholder system-properties-mode="OVERRIDE" properties-ref="environment"/>
 	<util:properties id="environment">
-		<prop key="cas.client.ip">https://localhost:8445/casclient</prop>
+		<prop key="cas.client.ip">https://casclientki.herokuapp.com/casclient</prop>
 		<prop key="cas.server.ip">https://localhost:8445</prop>
 	</util:properties>
 
