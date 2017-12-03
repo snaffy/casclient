@@ -58,12 +58,14 @@
 	<security:user-service id="userService">
 		<security:user name="casuser" password="Mellon" authorities="ROLE_ADMIN" />
 		<security:user name="artur" password="artur" authorities="ROLE_ADMIN" />
+		<security:user name="testki" password="volexideus13" authorities="ROLE_ADMIN" />
+		<security:user name="snaffy" password="volexideus13" authorities="ROLE_ADMIN" />
 	</security:user-service>
 	<bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
 
 	<context:property-placeholder system-properties-mode="OVERRIDE" properties-ref="environment"/>
 	<util:properties id="environment">
-		<prop key="cas.client.ip">https://casclientki.herokuapp.com/casclient</prop>
+		<prop key="cas.client.ip">https://casclientki.herokuapp.com</prop>
 		<prop key="cas.server.ip">https://localhost:8445</prop>
 	</util:properties>
 
